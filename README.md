@@ -1,1 +1,6 @@
-# visual-btree
+# Btree in TypeScript
+
+```
+yarn
+yarn build
+```
