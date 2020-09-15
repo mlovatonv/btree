@@ -2,5 +2,5 @@
 
 ```
 yarn
-yarn build
+yarn tsc
 ```
