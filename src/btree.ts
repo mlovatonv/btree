@@ -6,8 +6,8 @@ class btree {
     this.b = b;
     this.root = new btreenode();
   }
-    
-  public insert = (key: number) : void => {
+
+  public insert = (key: number): void => {
     const overflow: boolean = this._insert(this.root, key);
     if (overflow) this.splitRoot(this.root, key);
   };
@@ -59,10 +59,10 @@ class btree {
       leftNode.keys.splice(i, 1);
       leftNode.children.splice(i, 1);
     }
- 
+
     rightNode.children.push(leftNode.children[i]);
     leftNode.children.splice(i, 1);
-    
+
     node.keys.splice(pos, 0, leftNode.keys[mid]);
     node.children.splice(pos, 0, leftNode);
     node.children.splice(pos + 1, 0, rightNode);
@@ -83,5 +83,5 @@ class btree {
     } else {
       return node.keys[pos] === key && node.children[pos] !== undefined;
     }
-  }
+  };
 }
