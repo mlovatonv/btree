@@ -24,6 +24,7 @@ class btree {
   ): void => {
     json.name = node.keys.join();
     for (let i: number = 0; i < node.children.length; ++i) {
+      if (!node.children[i]) break;
       json.children.push({ name: "", children: [] });
       this.jsonify(json.children[i], node.children[i]);
     }
@@ -58,7 +59,7 @@ class btree {
     let i: number = 0;
 
     /* Fill left node */
-    for (; i < this.mid; --i) {
+    for (; i < this.mid; ++i) {
       leftNode.keys.push(rootNode.keys[i]);
       leftNode.children.push(rootNode.children[i]);
     }
@@ -88,17 +89,19 @@ class btree {
     const leftNode: btreenode = parentNode.children[pos];
     const rightNode: btreenode = new btreenode();
     let i: number = this.mid + 1;
+    let j: number = 0;
 
     /* Fill right node */
-    for (; i < this.order; --i) {
-      rightNode.keys.push(leftNode.keys[i]);
-      rightNode.children.push(leftNode.children[i]);
+    for (; i < this.order; ++i) {
+      rightNode.keys[j] = leftNode.keys[i];
+      rightNode.children[j] = leftNode.children[i];
+      ++j;
     }
-    rightNode.children.push(leftNode.children[i]);
+    rightNode.children[j] = leftNode.children[i];
 
     /* Update parent node */
     parentNode.keys.splice(pos, 0, leftNode.keys[this.mid]);
-    parentNode.children.splice(pos, 0, leftNode);
+    parentNode.children[pos] = leftNode;
     parentNode.children.splice(pos + 1, 0, rightNode);
 
     /* Clear left node */

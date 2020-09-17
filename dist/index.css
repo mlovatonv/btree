@@ -1,7 +1,3 @@
-.node {
-  cursor: pointer;
-}
-
 .node circle {
   fill: #fff;
   stroke: steelblue;
