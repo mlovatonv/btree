@@ -26,18 +26,25 @@
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
       var i = 0,
         duration = 750;
-
+      d3.select(self.frameElement).style("height", "500px");
+ 
       var tree = new btree(3);
-      for (var n = 0; n < 10; ++n) {
-        tree.insert(n);
-      }
       var root = tree.toJson();
-      console.log(root);
       root.x0 = height / 2;
       root.y0 = 0;
       update(root);
-      d3.select(self.frameElement).style("height", "500px");
-
+      var counter = 1;
+      for (var n = 0; n < 10; ++n) {
+        setTimeout(function() { 
+          tree.insert(counter);
+          root = tree.toJson();
+          root.x0 = height / 2;
+          root.y0 = 0;
+          update(root);
+          ++counter;
+        }, 2000 * n);
+      }
+ 
       function update(source) {
         // Compute the new tree layout
         var nodes = d3Tree.nodes(root).reverse(),
