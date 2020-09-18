@@ -4,11 +4,19 @@
     <meta charset="UTF-8" />
     <title>B-tree</title>
     <link rel="stylesheet" href="dist/index.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
     <script src="dist/index.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
   </head>
   <body>
     <h1>B-tree</h1>
+    <div class="row">
+      <input type="number" id="insertValue" value="" min="0" />
+      <button id="insertButton">Insert</button>
+    </div>
+    <div class="row">
+      <input type="number" id="deleteValue" value="" min="0" />
+      <button id="deleteButton">Delete</button>
+    </div>
     <script>
       var margin = { top: 20, right: 120, bottom: 20, left: 120 },
         width = 960 - margin.right - margin.left,
@@ -27,24 +35,43 @@
       var i = 0,
         duration = 750;
       d3.select(self.frameElement).style("height", "500px");
- 
+
       var tree = new btree(3);
       var root = tree.toJson();
       root.x0 = height / 2;
       root.y0 = 0;
       update(root);
-      var counter = 1;
-      for (var n = 0; n < 10; ++n) {
-        setTimeout(function() { 
-          tree.insert(counter);
+
+      var insertButton = document.getElementById("insertButton");
+      insertButton.addEventListener(
+        "click",
+        function (e) {
+          var value = Number(document.getElementById("insertValue").value);
+          tree.insert(value);
           root = tree.toJson();
           root.x0 = height / 2;
           root.y0 = 0;
           update(root);
-          ++counter;
-        }, 2000 * n);
-      }
- 
+          document.getElementById("insertValue").value = "";
+        },
+        false
+      );
+
+      var deleteButton = document.getElementById("deleteButton");
+      deleteButton.addEventListener(
+        "click",
+        function (e) {
+          var value = Number(document.getElementById("deleteValue").value);
+          tree.delete(value);
+          root = tree.toJson();
+          root.x0 = height / 2;
+          root.y0 = 0;
+          update(root);
+          document.getElementById("deleteValue").value = "";
+        },
+        false
+      );
+
       function update(source) {
         // Compute the new tree layout
         var nodes = d3Tree.nodes(root).reverse(),

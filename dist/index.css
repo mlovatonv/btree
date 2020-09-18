@@ -13,3 +13,7 @@
   stroke: #ccc;
   stroke-width: 2px;
 }
+
+.row {
+  margin: 10px 0;
+}
