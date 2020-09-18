@@ -14,6 +14,11 @@
   stroke-width: 2px;
 }
 
-.row {
-  margin: 10px 0;
+.action {
+  margin: 0 10px;
+  display: inline-block;
+}
+
+h1 {
+  margin-left: 10px;
 }

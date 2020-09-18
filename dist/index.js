@@ -43,11 +43,11 @@ class btree {
       const rootKey = rootNode.keys[i];
       leftNode.children.push(rootNode.children[i]);
       ++i;
-      for (; i < this.order - 1; ++i) {
+      for (; i < this.order; ++i) {
         rightNode.keys.push(rootNode.keys[i]);
         rightNode.children.push(rootNode.children[i]);
       }
-      rightNode.keys.push(rootNode.keys[i]);
+      rightNode.children.push(rootNode.children[i]);
       rootNode.keys.length = 0;
       rootNode.children.length = 0;
       rootNode.keys[0] = rootKey;
@@ -71,19 +71,40 @@ class btree {
       leftNode.keys.length = this.mid;
       leftNode.children.length = this.mid + 1;
     };
-    this.delete = (key) => {};
-    this.merge = (node, pos) => {};
+    this.delete = (key) => {
+      const underflow = this._delete(this.root, key);
+      if (underflow) this.mergeRoot(this.root, key);
+    };
+    this._delete = (node, key) => {
+      let pos = 0;
+      while (pos < node.keys.length && node.keys[pos] < key) ++pos;
+      const leftNode = node.children[pos];
+      const rightNode = node.children[pos + 1];
+      if (node.keys[pos] == key) {
+        if (!leftNode && !rightNode) {
+          node.keys.splice(pos, 1);
+        } else if (leftNode.children.length > this.mid) {
+        } else if (rightNode.children.length > this.mid) {
+        }
+      } else {
+        const underflow = this._delete(leftNode, key);
+        if (underflow) this.mergeNonRoot(node, pos);
+      }
+      return node.keys.length < this.mid;
+    };
+    this.mergeRoot = (node, pos) => {};
+    this.mergeNonRoot = (node, pos) => {};
     this.find = (key) => {
       return this._find(this.root, key);
     };
     this._find = (node, key) => {
       let pos = 0;
-      while (pos < node.keys.length && node.keys[pos] <= key) ++pos;
+      while (pos < node.keys.length && node.keys[pos] < key) ++pos;
       const childNode = node.children[pos];
       if (childNode) {
         return this._find(childNode, key);
       } else {
-        return node.keys[pos] === key && node.children[pos] !== undefined;
+        return node.keys[pos] === key ? node : null;
       }
     };
     this.order = order;

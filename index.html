@@ -3,23 +3,33 @@
   <head>
     <meta charset="UTF-8" />
     <title>B-tree</title>
+    <link
+      rel="icon"
+      type="image/png"
+      href="https://www.freefavicon.com/freefavicons/plants/tree-1-152-248090.png"
+    />
     <link rel="stylesheet" href="dist/index.css" />
     <script src="dist/index.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
   </head>
   <body>
     <h1>B-tree</h1>
-    <div class="row">
+    <div class="action">
       <input type="number" id="insertValue" value="" min="0" />
       <button id="insertButton">Insert</button>
     </div>
-    <div class="row">
+    <div class="action">
       <input type="number" id="deleteValue" value="" min="0" />
       <button id="deleteButton">Delete</button>
     </div>
+    <div class="action">
+      <input type="number" id="findValue" value="" min="0" />
+      <button id="findButton">Find</button>
+      <span id="findResult" />
+    </div>
     <script>
       var margin = { top: 20, right: 120, bottom: 20, left: 120 },
-        width = 960 - margin.right - margin.left,
+        width = 900 - margin.right - margin.left,
         height = 500 - margin.top - margin.bottom;
       var d3Tree = d3.layout.tree().size([height, width]);
       var diagonal = d3.svg.diagonal().projection(function (d) {
@@ -37,40 +47,20 @@
       d3.select(self.frameElement).style("height", "500px");
 
       var tree = new btree(3);
+      tree.insert(3);
+      tree.insert(4);
+      tree.insert(9);
+      tree.insert(7);
+      tree.insert(2);
+      tree.insert(10);
+      tree.insert(5);
+      tree.insert(1);
+      tree.insert(6);
+      tree.insert(8);
       var root = tree.toJson();
       root.x0 = height / 2;
       root.y0 = 0;
       update(root);
-
-      var insertButton = document.getElementById("insertButton");
-      insertButton.addEventListener(
-        "click",
-        function (e) {
-          var value = Number(document.getElementById("insertValue").value);
-          tree.insert(value);
-          root = tree.toJson();
-          root.x0 = height / 2;
-          root.y0 = 0;
-          update(root);
-          document.getElementById("insertValue").value = "";
-        },
-        false
-      );
-
-      var deleteButton = document.getElementById("deleteButton");
-      deleteButton.addEventListener(
-        "click",
-        function (e) {
-          var value = Number(document.getElementById("deleteValue").value);
-          tree.delete(value);
-          root = tree.toJson();
-          root.x0 = height / 2;
-          root.y0 = 0;
-          update(root);
-          document.getElementById("deleteValue").value = "";
-        },
-        false
-      );
 
       function update(source) {
         // Compute the new tree layout
@@ -183,6 +173,49 @@
           d.y0 = d.y;
         });
       }
+
+      var insertButton = document.getElementById("insertButton");
+      insertButton.addEventListener(
+        "click",
+        function (e) {
+          var value = Number(document.getElementById("insertValue").value);
+          tree.insert(value);
+          root = tree.toJson();
+          root.x0 = height / 2;
+          root.y0 = 0;
+          update(root);
+          document.getElementById("insertValue").value = "";
+        },
+        false
+      );
+
+      var deleteButton = document.getElementById("deleteButton");
+      deleteButton.addEventListener(
+        "click",
+        function (e) {
+          var value = Number(document.getElementById("deleteValue").value);
+          tree.delete(value);
+          root = tree.toJson();
+          root.x0 = height / 2;
+          root.y0 = 0;
+          update(root);
+          document.getElementById("deleteValue").value = "";
+        },
+        false
+      );
+
+      var findButton = document.getElementById("findButton");
+      findButton.addEventListener(
+        "click",
+        function (e) {
+          var value = Number(document.getElementById("findValue").value);
+          document.getElementById("findValue").value = "";
+          document.getElementById("findResult").textContent = String(
+            !!tree.find(value)
+          );
+        },
+        false
+      );
     </script>
   </body>
 </html>

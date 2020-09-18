@@ -70,11 +70,11 @@ class btree {
     ++i;
 
     /* Fill right node */
-    for (; i < this.order - 1; ++i) {
+    for (; i < this.order; ++i) {
       rightNode.keys.push(rootNode.keys[i]);
       rightNode.children.push(rootNode.children[i]);
     }
-    rightNode.keys.push(rootNode.keys[i]);
+    rightNode.children.push(rootNode.children[i]);
 
     /* Clear root node */
     rootNode.keys.length = 0;
@@ -109,25 +109,55 @@ class btree {
     leftNode.children.length = this.mid + 1;
   };
 
-  public delete = (key: number) => {};
-
-  private merge = (node: btreenode, pos: number): void => {};
-
-  public find = (key: number): boolean => {
-    return this._find(this.root, key);
+  public delete = (key: number): void => {
+    const underflow: boolean = this._delete(this.root, key);
+    if (underflow) this.mergeRoot(this.root, key);
   };
 
-  private _find = (node: btreenode, key: number): boolean => {
+  private _delete = (node: btreenode, key: number): boolean => {
     let pos: number = 0;
 
     /* Find a position where the key is smaller than other */
-    while (pos < node.keys.length && node.keys[pos] <= key) ++pos;
+    while (pos < node.keys.length && node.keys[pos] < key) ++pos;
+
+    const leftNode: btreenode = node.children[pos];
+    const rightNode: btreenode = node.children[pos + 1];
+    if (node.keys[pos] == key) {
+      if (!leftNode && !rightNode) {
+        /* Node is a leaf */
+        node.keys.splice(pos, 1);
+      } else if (leftNode.children.length > this.mid) {
+        /* Left node has at least mid + 1 keys */
+      } else if (rightNode.children.length > this.mid) {
+        /* Right node has at least mid + 1 keys */
+      }
+      // const underflow: boolean = this._delete(childNode, key);
+    } else {
+      const underflow: boolean = this._delete(leftNode, key);
+      if (underflow) this.mergeNonRoot(node, pos);
+    }
+    return node.keys.length < this.mid;
+  };
+
+  private mergeRoot = (node: btreenode, pos: number): void => {};
+
+  private mergeNonRoot = (node: btreenode, pos: number): void => {};
+
+  public find = (key: number): btreenode | null => {
+    return this._find(this.root, key);
+  };
+
+  private _find = (node: btreenode, key: number): btreenode | null => {
+    let pos: number = 0;
+
+    /* Find a position where the key is smaller than other */
+    while (pos < node.keys.length && node.keys[pos] < key) ++pos;
 
     const childNode: btreenode = node.children[pos];
     if (childNode) {
       return this._find(childNode, key);
     } else {
-      return node.keys[pos] === key && node.children[pos] !== undefined;
+      return node.keys[pos] === key ? node : null;
     }
   };
 }
