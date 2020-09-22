@@ -53,7 +53,14 @@
       root.y0 = 0;
       update(root);
 
+      for (var i = 0; i < 10; ++i) tree.insert(i);
+      root = tree.toJson();
+      root.x0 = height / 2;
+      root.y0 = 0;
+      update(root);
+
       function update(source) {
+        console.log(source)
         // Compute the new tree layout
         var nodes = d3Tree.nodes(root).reverse(),
           links = d3Tree.links(nodes);

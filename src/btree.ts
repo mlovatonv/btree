@@ -116,32 +116,64 @@ class btree {
 
   private _delete = (node: btreenode, key: number): boolean => {
     let pos: number = 0;
+    let childNode: btreenode;
 
     /* Find a position where the key is smaller than other */
     while (pos < node.keys.length && node.keys[pos] < key) ++pos;
 
     const leftNode: btreenode = node.children[pos];
     const rightNode: btreenode = node.children[pos + 1];
+    let underflow: boolean = false;
     if (node.keys[pos] == key) {
-      if (!leftNode && !rightNode) {
+      if (!leftNode) {
         /* Node is a leaf */
         node.keys.splice(pos, 1);
-      } else if (leftNode.children.length > this.mid) {
-        /* Left node has at least mid + 1 keys */
-      } else if (rightNode.children.length > this.mid) {
-        /* Right node has at least mid + 1 keys */
+      } else {
+        if (leftNode.children.length > this.mid) {
+          /* Left node has at least mid + 1 keys */
+          key = leftNode.keys[leftNode.keys.length - 1];
+          node.keys[pos] = key;
+          underflow = this._delete(leftNode, key);
+        } else if (rightNode.children.length > this.mid) {
+          /* Right node has at least mid + 1 keys */
+          key = rightNode.keys[rightNode.keys.length - 1];
+          node.keys[pos] = key;
+          underflow = this._delete(rightNode, key);
+        } else {
+          /* Left and right node have mid keys */
+          node.keys.splice(pos, 1);
+          leftNode.keys.push(key);
+          leftNode.keys.concat(rightNode.keys);
+          leftNode.children.concat(leftNode.children);
+          node.children.splice(pos + 1, 1);
+          underflow = this._delete(leftNode, key);
+        }
       }
-      // const underflow: boolean = this._delete(childNode, key);
-    } else {
-      const underflow: boolean = this._delete(leftNode, key);
-      if (underflow) this.mergeNonRoot(node, pos);
+    } else if (leftNode) {
+      underflow = this._delete(leftNode, key);
     }
+    if (underflow) this.mergeNonRoot(node, pos);
     return node.keys.length < this.mid;
   };
 
   private mergeRoot = (node: btreenode, pos: number): void => {};
 
-  private mergeNonRoot = (node: btreenode, pos: number): void => {};
+  private mergeNonRoot = (node: btreenode, pos: number): void => {
+    const leftNode: btreenode = node.children[pos];
+    const rightNode: btreenode = node.children[pos + 1];
+    const nodeKey: number = node.keys[pos];
+    /* Right node has at least mid + 1 keys */
+    if (rightNode && rightNode.keys.length > this.mid) {
+      leftNode.keys.push(nodeKey);
+      node.keys[pos] = rightNode.keys[0];
+      rightNode.keys.splice(0, 1);
+    } else {
+      leftNode.keys.push(nodeKey);
+      leftNode.keys.concat(rightNode.keys);
+      node.keys.splice(pos, 1);
+      node.children.splice(pos + 1, 1);
+    }
+  };
 
   public find = (key: number): btreenode | null => {
     return this._find(this.root, key);
